@@ -10,6 +10,7 @@ export function Cursor() {
   const reduced = useReducedMotion();
   const [enabled, setEnabled] = useState(false);
   const [hovering, setHovering] = useState(false);
+  const [label, setLabel] = useState("");
   const [visible, setVisible] = useState(false);
 
   const x = useMotionValue(-100);
@@ -31,7 +32,11 @@ export function Cursor() {
     };
     const over = (event: PointerEvent) => {
       const target = event.target as HTMLElement | null;
-      setHovering(Boolean(target?.closest("a, button, [data-cursor='hover']")));
+      const labelled = target?.closest<HTMLElement>("[data-cursor-label]");
+      setLabel(labelled?.dataset.cursorLabel ?? "");
+      setHovering(
+        Boolean(labelled) || Boolean(target?.closest("a, button, [data-cursor='hover']")),
+      );
     };
     const leave = () => setVisible(false);
 
@@ -61,9 +66,19 @@ export function Cursor() {
       <motion.div
         className="absolute h-9 w-9 rounded-full border border-white/70"
         style={{ x: ringX, y: ringY, translateX: "-50%", translateY: "-50%" }}
-        animate={{ scale: hovering ? 1.8 : 1, opacity: hovering ? 1 : 0.55 }}
+        animate={{ scale: label ? 2.4 : hovering ? 1.8 : 1, opacity: hovering ? 1 : 0.55 }}
         transition={{ type: "spring", stiffness: 260, damping: 20 }}
       />
+      <motion.div
+        className="absolute"
+        style={{ x: ringX, y: ringY, translateX: "-50%", translateY: "-50%" }}
+        animate={{ opacity: label ? 1 : 0 }}
+        transition={{ duration: 0.18 }}
+      >
+        <span className="whitespace-nowrap font-mono text-[8px] font-medium uppercase tracking-[0.16em] text-white">
+          {label}
+        </span>
+      </motion.div>
     </div>
   );
 }

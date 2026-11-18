@@ -46,7 +46,7 @@ export function Features() {
     <section id="how-it-works" className="relative scroll-mt-24">
       <div className="mx-auto w-full max-w-[1440px] px-4 py-16 sm:px-8 lg:py-24">
         <div className="flex items-center justify-between gap-4 border-b border-uni-line py-3 font-mono text-[9px] uppercase tracking-[0.2em] text-uni-muted dark:border-uni-darkline dark:text-white/40">
-          <span>[ 05 — how it works ]</span>
+          <span>[ 06 — how it works ]</span>
           <span className="hidden sm:inline">Mechanics / no trust required</span>
         </div>
 

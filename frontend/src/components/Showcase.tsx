@@ -125,6 +125,7 @@ type ShowCardProps = {
 function ShowCard({ tag, title, body, delay, children }: ShowCardProps) {
   return (
     <Reveal delay={delay} className="h-full">
+      <div data-cursor-label="View" className="h-full">
       <Tilt max={5} className="h-full">
         <article className="bracket-card relative h-full border border-uni-line bg-cream-card p-2 dark:border-uni-darkline dark:bg-uni-surface">
           <div className="card-shine relative flex h-full flex-col overflow-hidden bg-cream-card p-5 dark:bg-uni-surface">
@@ -144,6 +145,7 @@ function ShowCard({ tag, title, body, delay, children }: ShowCardProps) {
           </div>
         </article>
       </Tilt>
+      </div>
     </Reveal>
   );
 }

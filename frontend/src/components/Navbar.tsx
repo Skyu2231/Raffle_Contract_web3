@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { CHAIN_META, explorerAddressUrl } from "../lib/config";
 import { ConnectWallet } from "./ConnectWallet";
+import { ScrambleText } from "./ScrambleText";
 import { TrackingFox } from "./TrackingFox";
 import { ArrowUpRight, Close, Menu, Moon, Sun } from "./icons";
 
@@ -63,7 +64,7 @@ export function Navbar({ theme, onToggleTheme, chainId, contractAddress }: Navba
               rel={link.external ? "noreferrer" : undefined}
               className="link-line group flex items-center gap-1 font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-uni-muted transition-colors hover:text-uni-ink dark:text-white/55 dark:hover:text-white"
             >
-              {link.label}
+              <ScrambleText text={link.label} />
               {link.external && (
                 <ArrowUpRight className="h-3 w-3 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
               )}
@@ -127,7 +128,7 @@ export function Navbar({ theme, onToggleTheme, chainId, contractAddress }: Navba
                   className="group flex items-baseline justify-between border-b border-uni-line/70 py-5 dark:border-uni-darkline/70"
                 >
                   <span className="display text-[34px] leading-none transition-colors group-hover:text-fox">
-                    {link.label}
+                    <ScrambleText text={link.label} />
                   </span>
                   <span className="font-mono text-[10px] tracking-[0.2em] text-uni-muted">
                     0{index + 1}

@@ -6,6 +6,7 @@ import { Features } from "./components/Features";
 import { Footer } from "./components/Footer";
 import { Hero } from "./components/Hero";
 import { InfoColumn } from "./components/InfoColumn";
+import { Manifesto } from "./components/Manifesto";
 import { Navbar } from "./components/Navbar";
 import { Preloader } from "./components/Preloader";
 import { RaffleCard } from "./components/RaffleCard";
@@ -129,6 +130,7 @@ export default function App() {
 
         <StatsBand stats={stats} />
         <Showcase />
+        <Manifesto />
         <Features />
         <CtaBand />
       </main>
