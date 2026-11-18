@@ -1,0 +1,288 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  .dark {
+    color-scheme: dark;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  html,
+  body,
+  #root {
+    min-height: 100%;
+  }
+
+  body {
+    @apply bg-cream font-sans text-uni-ink antialiased dark:bg-[#12100e] dark:text-white;
+    overflow-x: hidden;
+  }
+
+  button {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  ::selection {
+    background: rgba(255, 92, 22, 0.22);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+}
+
+@layer components {
+  .surface {
+    @apply rounded-4xl border border-uni-line bg-white shadow-card dark:border-uni-darkline dark:bg-uni-surface dark:shadow-card-dark;
+  }
+
+  .surface-soft {
+    @apply rounded-2xl bg-cream-deep dark:bg-[#28231f];
+  }
+
+  .tnum {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* MetaMask-style orange pill CTA with a light sweep on hover */
+  .btn-primary {
+    @apply relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full px-6 py-3.5 text-base font-semibold text-white
+      transition duration-200;
+    background-image: linear-gradient(135deg, #ff7a2f 0%, #ff5c16 55%, #f04f0a 100%);
+    box-shadow: 0 10px 26px -8px rgba(255, 92, 22, 0.55);
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 16px 34px -10px rgba(255, 92, 22, 0.6);
+  }
+
+  .btn-primary:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  .btn-primary:disabled {
+    @apply cursor-not-allowed text-white/85;
+    background-image: linear-gradient(135deg, #ffc7a6 0%, #ffb488 100%);
+    box-shadow: none;
+  }
+
+  .dark .btn-primary:disabled {
+    background-image: linear-gradient(135deg, #4a352a 0%, #3d2b22 100%);
+    @apply text-white/60;
+  }
+
+  .btn-primary > .sheen {
+    @apply pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 bg-white/25;
+  }
+
+  .btn-primary:hover:not(:disabled) > .sheen {
+    animation: sheen 0.85s ease-out;
+  }
+
+  .btn-ink {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-uni-ink px-5 py-3 text-sm font-semibold text-white transition duration-200
+      hover:-translate-y-0.5 hover:bg-black disabled:cursor-not-allowed disabled:opacity-60 dark:bg-white dark:text-uni-ink dark:hover:bg-[#efe7df];
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-uni-line bg-white px-4 py-2.5 text-sm font-medium
+      text-uni-ink transition duration-200 hover:-translate-y-0.5 hover:border-fox-tint hover:bg-fox-soft
+      disabled:cursor-not-allowed disabled:opacity-60 dark:border-uni-darkline dark:bg-transparent dark:text-white dark:hover:border-fox/40 dark:hover:bg-fox/10;
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-uni-ink/15 bg-white/70 px-5 py-3 text-sm font-semibold
+      text-uni-ink backdrop-blur transition duration-200 hover:-translate-y-0.5 hover:border-uni-ink/30 hover:bg-white
+      dark:border-white/15 dark:bg-white/5 dark:text-white dark:hover:bg-white/10;
+  }
+
+  .icon-btn {
+    @apply flex h-10 w-10 items-center justify-center rounded-full border border-uni-line bg-white text-uni-ink transition duration-200
+      hover:-translate-y-0.5 hover:border-fox-tint hover:bg-fox-soft dark:border-uni-darkline dark:bg-transparent dark:text-white dark:hover:border-fox/40 dark:hover:bg-fox/10;
+  }
+
+  .label {
+    @apply text-sm font-medium text-uni-muted;
+  }
+
+  .eyebrow {
+    @apply inline-flex items-center gap-2 rounded-full border border-fox-tint/80 bg-white/80 px-3.5 py-1.5 text-xs font-semibold
+      text-fox-deep shadow-pill backdrop-blur dark:border-fox/25 dark:bg-fox/10 dark:text-fox-glow;
+  }
+
+  /* Chainlink-style monospace label: [ 01 — BUY ] */
+  .tag-mono {
+    @apply font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-fox-deep dark:text-fox-glow;
+  }
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .mask-fade-r {
+    mask-image: linear-gradient(to right, black 85%, transparent);
+  }
+
+  .mask-fade-x {
+    mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* scroll reveal — driven by IntersectionObserver in useReveal */
+  .reveal {
+    opacity: 0;
+    transform: translateY(18px);
+    transition:
+      opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: opacity, transform;
+  }
+
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  .grid-lines {
+    background-image:
+      linear-gradient(to right, rgba(23, 19, 16, 0.045) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(23, 19, 16, 0.045) 1px, transparent 1px);
+    background-size: 64px 64px;
+  }
+
+  .dark .grid-lines {
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  }
+
+  .fox-gradient-text {
+    background-image: linear-gradient(100deg, #ff8a4c 0%, #ff5c16 45%, #e2470a 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .pause-on-hover:hover {
+    animation-play-state: paused;
+  }
+
+  /* pointer-tracked 3D tilt (values written by <Tilt />) */
+  .tilt {
+    transform: perspective(1100px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+    transform-style: preserve-3d;
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform;
+  }
+
+  .tilt-glare {
+    background: radial-gradient(
+      420px circle at var(--glare-x, 50%) var(--glare-y, 50%),
+      rgba(255, 255, 255, 0.5),
+      transparent 62%
+    );
+    opacity: var(--glare, 0);
+    transition: opacity 0.35s ease;
+  }
+
+  /* light sweep across a card on hover */
+  .card-shine::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      105deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.55) 48%,
+      transparent 66%
+    );
+    transform: translateX(-130%);
+    transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .card-shine:hover::after {
+    transform: translateX(130%);
+  }
+
+  .dark .card-shine::after {
+    background: linear-gradient(
+      105deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.14) 48%,
+      transparent 66%
+    );
+  }
+
+  /* soft film grain, Aave-ish texture */
+  .noise {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+    opacity: 0.035;
+  }
+
+  .mask-fade-b {
+    mask-image: linear-gradient(to bottom, black 65%, transparent);
+  }
+
+  /* Chainlink-ish corner ticks; pair with .card-shine on an inner element */
+  .bracket-card::before,
+  .bracket-card::after {
+    content: "";
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    pointer-events: none;
+    border-color: rgba(255, 92, 22, 0.45);
+    z-index: 1;
+  }
+
+  .bracket-card::before {
+    top: 14px;
+    left: 14px;
+    border-top: 1px solid;
+    border-left: 1px solid;
+    border-top-left-radius: 4px;
+  }
+
+  .bracket-card::after {
+    right: 14px;
+    bottom: 14px;
+    border-right: 1px solid;
+    border-bottom: 1px solid;
+    border-bottom-right-radius: 4px;
+  }
+
+  .dark .bracket-card::before,
+  .dark .bracket-card::after {
+    border-color: rgba(255, 138, 76, 0.4);
+  }
+}
