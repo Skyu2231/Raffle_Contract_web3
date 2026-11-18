@@ -1,49 +1,44 @@
 import { useAccount } from "wagmi";
-import { BackgroundGlow } from "./components/BackgroundGlow";
 import { Banner } from "./components/Banner";
 import { CtaBand } from "./components/CtaBand";
+import { Cursor } from "./components/Cursor";
 import { Features } from "./components/Features";
 import { Footer } from "./components/Footer";
 import { Hero } from "./components/Hero";
 import { InfoColumn } from "./components/InfoColumn";
-import { Marquee } from "./components/Marquee";
 import { Navbar } from "./components/Navbar";
+import { Preloader } from "./components/Preloader";
 import { RaffleCard } from "./components/RaffleCard";
 import { Reveal } from "./components/Reveal";
+import { RevealText } from "./components/RevealText";
 import { ScrollProgress } from "./components/ScrollProgress";
+import { ScrollTicker } from "./components/ScrollTicker";
 import { Showcase } from "./components/Showcase";
+import { SmoothScroll } from "./components/SmoothScroll";
 import { StatsBand } from "./components/StatsBand";
 import { useActivity } from "./hooks/useActivity";
 import { useCountdown } from "./hooks/useCountdown";
 import { useRaffle } from "./hooks/useRaffle";
 import { useTheme } from "./hooks/useTheme";
-import { DEFAULT_CHAIN_ID, getRaffleAddress } from "./lib/config";
+import { CHAIN_META, DEFAULT_CHAIN_ID, getRaffleAddress } from "./lib/config";
 import { Sparkle } from "./components/icons";
 
-const TICKER = [
-  "Provably fair draws",
-  "Chainlink VRF v2.5",
-  "0% house edge",
-  "Instant payout",
-  "Fully on-chain",
-  "Self-custody",
-  "Open to everyone",
-];
+const TICKER = ["Provably fair", "0% house edge", "Instant payout", "Fully on-chain"];
 
 function ConfigNotice() {
   return (
-    <div className="mb-6 flex items-start gap-3 rounded-2xl border border-fox-tint bg-fox-soft px-4 py-3.5 text-sm text-fox-deep dark:border-fox/25 dark:bg-fox/10 dark:text-fox-glow">
-      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-fox text-white">
+    <div className="mb-8 flex items-start gap-3 border border-fox-tint bg-fox-soft px-4 py-3.5 text-sm text-fox-deep dark:border-fox/25 dark:bg-fox/10 dark:text-fox-glow">
+      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center bg-fox font-mono text-[11px] font-bold text-white">
         !
       </span>
       <span>
         <span className="font-semibold">No raffle contract configured for this network.</span> Deploy
         with{" "}
-        <code className="rounded bg-white/70 px-1 py-0.5 font-mono text-xs dark:bg-white/10">
+        <code className="rounded-sm bg-white/70 px-1 py-0.5 font-mono text-xs dark:bg-white/10">
           make deploy
         </code>{" "}
         and add the address to <code className="font-mono text-xs">frontend/.env</code> as{" "}
-        <code className="rounded bg-white/70 px-1 py-0.5 font-mono text-xs dark:bg-white/10">
+        <code className="rounded-sm bg-white/70 px-1 py-0.5 font-mono text-xs dark:bg-white/10">
           VITE_RAFFLE_ADDRESS_11155111
         </code>
         .
@@ -63,7 +58,9 @@ export default function App() {
 
   return (
     <div className="relative min-h-screen">
-      <BackgroundGlow />
+      <SmoothScroll />
+      <Preloader />
+      <Cursor />
       <div className="noise pointer-events-none fixed inset-0 z-[5]" aria-hidden="true" />
       <ScrollProgress />
       <Banner />
@@ -76,26 +73,33 @@ export default function App() {
 
       <Hero stats={stats} countdown={countdown} />
 
-      <div className="border-y border-uni-line/80 bg-white/60 py-3.5 backdrop-blur dark:border-uni-darkline dark:bg-white/[0.02]">
-        <Marquee items={TICKER} />
+      <div className="overflow-hidden border-b border-uni-line bg-bone py-4 dark:border-uni-darkline dark:bg-void sm:py-6">
+        <ScrollTicker items={TICKER} />
       </div>
 
       <main className="relative">
-        <section id="raffle" className="mx-auto w-full max-w-[1200px] scroll-mt-24 px-4 py-14 sm:px-6 lg:py-20">
+        <section id="raffle" className="mx-auto w-full max-w-[1440px] scroll-mt-24 px-4 py-14 sm:px-8 lg:py-20">
+          <div className="mb-9 flex items-center justify-between gap-4 border-b border-uni-line py-3 font-mono text-[9px] uppercase tracking-[0.2em] text-uni-muted dark:border-uni-darkline dark:text-white/40">
+            <span className="flex items-center gap-2">
+              <Sparkle className="h-3 w-3 text-fox" />
+              [ 02 — live raffle ]
+            </span>
+            <span>{CHAIN_META[chainId]?.name ?? "Unknown network"} / entry open</span>
+          </div>
+
           {!stats.configured && <ConfigNotice />}
 
-          <Reveal className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <span className="eyebrow">
-                <Sparkle className="h-3.5 w-3.5" />
-                Live raffle
+          <Reveal className="mb-10 grid gap-6 lg:grid-cols-[1.4fr_minmax(0,0.85fr)] lg:items-end lg:gap-12">
+            <h2 className="display text-[clamp(34px,5.6vw,66px)]">
+              <RevealText text="Buy a ticket." delay={0.05} />
+              <br />
+              <span className="serif-accent normal-case text-fox">
+                <RevealText text="Watch the draw." delay={0.18} />
               </span>
-              <h2 className="mt-4 text-balance font-display text-[34px] font-extrabold leading-[1.02] tracking-[-0.03em] sm:text-[46px]">
-                Buy a ticket. Watch the draw.
-              </h2>
-            </div>
-            <p className="max-w-[280px] text-sm leading-relaxed text-uni-muted">
-              The pot updates with every entry. When the timer hits zero, one ticket takes it all.
+            </h2>
+            <p className="max-w-[340px] border-l border-uni-line pl-5 text-sm leading-relaxed text-uni-muted dark:border-uni-darkline dark:text-white/50">
+              The pot updates with every entry. When the timer hits zero, one ticket takes it all —
+              verified by Chainlink, not by us.
             </p>
           </Reveal>
 
@@ -117,7 +121,7 @@ export default function App() {
             </aside>
           </div>
 
-          <p className="mt-6 max-w-[640px] text-[11px] leading-relaxed text-uni-muted">
+          <p className="mt-7 max-w-[640px] border-l border-uni-line pl-4 font-mono text-[9px] uppercase leading-relaxed tracking-[0.14em] text-uni-muted dark:border-uni-darkline dark:text-white/35">
             Every transaction is final. This is unaudited sample software — use testnets and only
             spend what you can afford to lose.
           </p>

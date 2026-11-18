@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
 import { CHAIN_META, explorerAddressUrl } from "../lib/config";
 import { ConnectWallet } from "./ConnectWallet";
 import { TrackingFox } from "./TrackingFox";
@@ -32,44 +33,49 @@ export function Navbar({ theme, onToggleTheme, chainId, contractAddress }: Navba
   ];
 
   return (
+    <>
     <header
-      className={`sticky top-0 z-40 bg-cream/85 backdrop-blur-xl transition-shadow duration-300 dark:bg-[#12100e]/85 ${
-        scrolled
-          ? "border-b border-uni-line shadow-[0_8px_30px_-24px_rgba(23,19,16,0.5)] dark:border-uni-darkline"
-          : "border-b border-transparent"
+      className={`sticky top-0 z-40 border-b backdrop-blur-xl transition-colors duration-500 ${
+        scrolled || menuOpen
+          ? "border-uni-line bg-bone/85 dark:border-uni-darkline dark:bg-void/85"
+          : "border-transparent bg-bone/40 dark:bg-void/40"
       }`}
     >
-      <div className="mx-auto flex h-[76px] w-full max-w-[1200px] items-center justify-between gap-4 px-4 sm:px-6">
-        <div className="flex items-center gap-8">
-          <a href="#" className="group flex items-center gap-2.5">
-            <TrackingFox className="h-9 w-9 transition duration-300 group-hover:-rotate-6 group-hover:scale-105" />
-            <span className="font-display text-[21px] font-extrabold uppercase tracking-[-0.01em]">raffle</span>
-          </a>
+      <div className="mx-auto flex h-[72px] w-full max-w-[1440px] items-center justify-between gap-4 px-4 sm:px-8">
+        <a href="#" className="group flex items-center gap-3">
+          <span className="flex h-10 w-10 items-center justify-center border border-uni-ink/15 transition-colors duration-300 group-hover:border-fox dark:border-white/20">
+            <TrackingFox className="h-7 w-7 transition duration-500 group-hover:-rotate-12" />
+          </span>
+          <span className="flex flex-col">
+            <span className="display text-[22px] leading-[0.8]">raffle</span>
+            <span className="mt-1 hidden font-mono text-[8px] uppercase tracking-[0.28em] text-uni-muted sm:block dark:text-white/40">
+              on-chain lottery
+            </span>
+          </span>
+        </a>
 
-          <nav className="hidden items-center gap-1 lg:flex">
-            {links.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                target={link.external ? "_blank" : undefined}
-                rel={link.external ? "noreferrer" : undefined}
-                className="group relative flex items-center gap-0.5 rounded-full px-3.5 py-2 text-sm font-semibold text-uni-muted transition hover:text-uni-ink dark:hover:text-white"
-              >
-                {link.label}
-                {link.external && (
-                  <ArrowUpRight className="h-3 w-3 opacity-60 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-                )}
-                <span className="pointer-events-none absolute inset-x-3.5 -bottom-0.5 h-[2px] origin-left scale-x-0 rounded-full bg-fox transition-transform duration-300 group-hover:scale-x-100" />
-              </a>
-            ))}
-          </nav>
-        </div>
+        <nav className="hidden items-center gap-7 lg:flex">
+          {links.map((link) => (
+            <a
+              key={link.label}
+              href={link.href}
+              target={link.external ? "_blank" : undefined}
+              rel={link.external ? "noreferrer" : undefined}
+              className="link-line group flex items-center gap-1 font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-uni-muted transition-colors hover:text-uni-ink dark:text-white/55 dark:hover:text-white"
+            >
+              {link.label}
+              {link.external && (
+                <ArrowUpRight className="h-3 w-3 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+              )}
+            </a>
+          ))}
+        </nav>
 
-        <div className="flex items-center gap-2">
-          <div className="hidden items-center gap-2 rounded-full border border-uni-line bg-white/70 px-3 py-1.5 text-xs font-semibold backdrop-blur sm:flex dark:border-uni-darkline dark:bg-white/5">
+        <div className="flex items-center gap-2.5">
+          <div className="hidden items-center gap-2 border border-uni-line px-3 py-2 font-mono text-[9px] uppercase tracking-[0.16em] text-uni-muted sm:flex dark:border-uni-darkline dark:text-white/55">
             <span
-              className="relative flex h-2 w-2 rounded-full"
-              style={{ background: chain?.accent ?? "#ff5c16" }}
+              className="h-1.5 w-1.5 rounded-full"
+              style={{ background: chain?.accent ?? "#ff4d00" }}
             />
             {chain?.name ?? "Unknown"}
           </div>
@@ -80,9 +86,9 @@ export function Navbar({ theme, onToggleTheme, chainId, contractAddress }: Navba
             aria-label="Toggle theme"
           >
             {theme === "dark" ? (
-              <Sun className="h-[18px] w-[18px]" />
+              <Sun className="h-[17px] w-[17px]" />
             ) : (
-              <Moon className="h-[18px] w-[18px]" />
+              <Moon className="h-[17px] w-[17px]" />
             )}
           </button>
           <div className="hidden sm:block">
@@ -99,29 +105,45 @@ export function Navbar({ theme, onToggleTheme, chainId, contractAddress }: Navba
           </button>
         </div>
       </div>
-
-      {menuOpen && (
-        <div className="animate-pop-in border-t border-uni-line bg-cream px-4 pb-5 pt-2 lg:hidden dark:border-uni-darkline dark:bg-[#12100e]">
-          <nav className="flex flex-col">
-            {links.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                target={link.external ? "_blank" : undefined}
-                rel={link.external ? "noreferrer" : undefined}
-                onClick={() => setMenuOpen(false)}
-                className="flex items-center justify-between border-b border-uni-line/70 py-3 text-sm font-semibold last:border-0 dark:border-uni-darkline/70"
-              >
-                {link.label}
-                {link.external && <ArrowUpRight className="h-3.5 w-3.5 text-uni-muted" />}
-              </a>
-            ))}
-          </nav>
-          <div className="mt-4 sm:hidden">
-            <ConnectWallet />
-          </div>
-        </div>
-      )}
     </header>
+
+    <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            className="fixed inset-x-0 top-[72px] bottom-0 z-30 overflow-y-auto border-t border-uni-line bg-bone px-4 pb-10 pt-4 lg:hidden dark:border-uni-darkline dark:bg-void"
+          >
+            <nav className="flex flex-col">
+              {links.map((link, index) => (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  target={link.external ? "_blank" : undefined}
+                  rel={link.external ? "noreferrer" : undefined}
+                  onClick={() => setMenuOpen(false)}
+                  className="group flex items-baseline justify-between border-b border-uni-line/70 py-5 dark:border-uni-darkline/70"
+                >
+                  <span className="display text-[34px] leading-none transition-colors group-hover:text-fox">
+                    {link.label}
+                  </span>
+                  <span className="font-mono text-[10px] tracking-[0.2em] text-uni-muted">
+                    0{index + 1}
+                  </span>
+                </a>
+              ))}
+            </nav>
+            <div className="mt-6 sm:hidden">
+              <ConnectWallet />
+            </div>
+            <p className="mt-8 max-w-[280px] font-mono text-[10px] uppercase leading-relaxed tracking-[0.16em] text-uni-muted">
+              Provable randomness, zero custody. One ticket takes the whole pot.
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }

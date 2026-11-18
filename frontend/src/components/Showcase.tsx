@@ -1,5 +1,6 @@
 import { Marquee } from "./Marquee";
 import { Reveal } from "./Reveal";
+import { RevealText } from "./RevealText";
 import { Tilt } from "./Tilt";
 import { Avatar } from "./Avatar";
 import type { ReactNode } from "react";
@@ -124,11 +125,11 @@ type ShowCardProps = {
 function ShowCard({ tag, title, body, delay, children }: ShowCardProps) {
   return (
     <Reveal delay={delay} className="h-full">
-      <Tilt max={6} className="h-full rounded-4xl">
-        <article className="bracket-card relative h-full rounded-4xl border border-uni-line bg-white p-2.5 shadow-card dark:border-uni-darkline dark:bg-uni-surface dark:shadow-card-dark">
-          <div className="card-shine relative flex h-full flex-col overflow-hidden rounded-[22px] bg-gradient-to-b from-white to-cream/80 p-5 dark:from-uni-surface dark:to-[#241e19]">
+      <Tilt max={5} className="h-full">
+        <article className="bracket-card relative h-full border border-uni-line bg-cream-card p-2 dark:border-uni-darkline dark:bg-uni-surface">
+          <div className="card-shine relative flex h-full flex-col overflow-hidden bg-cream-card p-5 dark:bg-uni-surface">
             <span className="tag-mono">{tag}</span>
-            <h3 className="mt-2.5 font-display text-[22px] font-bold leading-[1.1] tracking-[-0.02em]">
+            <h3 className="mt-3 font-display text-[24px] font-bold uppercase leading-[1.02] tracking-[-0.03em]">
               {title}
             </h3>
             <p className="mt-2 text-sm leading-relaxed text-uni-muted">{body}</p>
@@ -149,39 +150,40 @@ function ShowCard({ tag, title, body, delay, children }: ShowCardProps) {
 
 export function Showcase() {
   return (
-    <section id="app" className="relative overflow-hidden">
-      <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,224,204,0.6),transparent_60%)] dark:bg-[radial-gradient(ellipse_at_top,rgba(255,92,22,0.08),transparent_60%)]"
-        aria-hidden="true"
-      />
-      <div className="relative mx-auto w-full max-w-[1200px] px-4 py-16 sm:px-6 lg:py-24">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-          <Reveal className="max-w-[560px]">
-            <span className="tag-mono">[ 02 — inside the app ]</span>
-            <h2 className="mt-4 font-display text-[36px] font-extrabold leading-[0.98] tracking-[-0.03em] sm:text-[52px]">
-              Buy, draw, verify.
-            </h2>
-            <p className="mt-4 max-w-[460px] text-[15px] leading-relaxed text-uni-muted">
+    <section id="app" className="relative overflow-hidden border-t border-uni-line dark:border-uni-darkline">
+      <div className="relative mx-auto w-full max-w-[1440px] px-4 py-16 sm:px-8 lg:py-24">
+        <div className="flex items-center justify-between gap-4 border-b border-uni-line py-3 font-mono text-[9px] uppercase tracking-[0.2em] text-uni-muted dark:border-uni-darkline dark:text-white/40">
+          <span>[ 04 — inside the app ]</span>
+          <span className="hidden sm:inline">Three screens / one round</span>
+        </div>
+
+        <div className="mt-10 grid gap-8 lg:grid-cols-[1.5fr_minmax(0,0.8fr)] lg:items-end">
+          <h2 className="display text-[clamp(34px,5.6vw,66px)]">
+            <RevealText text="Buy, draw," delay={0.05} />
+            <br />
+            <span className="serif-accent normal-case text-fox">
+              <RevealText text="verify." delay={0.18} />
+            </span>
+          </h2>
+          <div className="lg:pb-2">
+            <p className="max-w-[400px] border-l border-uni-line pl-5 text-sm leading-relaxed text-uni-muted dark:border-uni-darkline dark:text-white/50">
               Three screens, no account, no custody. The same on-chain round rendered as a clean
               little app — because a lottery you can read is a lottery you can trust.
             </p>
-          </Reveal>
-
-          <Reveal delay={80}>
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 pl-5">
               {["mobile ready", "live data", "vrf-backed"].map((item) => (
                 <span
                   key={item}
-                  className="rounded-full border border-uni-line bg-white/80 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-uni-muted backdrop-blur dark:border-uni-darkline dark:bg-white/5"
+                  className="font-mono text-[9px] uppercase tracking-[0.16em] text-uni-muted dark:text-white/40"
                 >
-                  {item}
+                  / {item}
                 </span>
               ))}
             </div>
-          </Reveal>
+          </div>
         </div>
 
-        <div className="mt-10 grid gap-4 md:grid-cols-3">
+        <div className="mt-12 grid gap-4 md:grid-cols-3">
           <ShowCard
             tag="[ 01 — buy ]"
             title="Pick your tickets"
@@ -209,7 +211,7 @@ export function Showcase() {
         </div>
 
         <Reveal delay={120}>
-          <div className="mt-12 overflow-hidden rounded-2xl border border-white/10 bg-uni-ink py-2.5">
+          <div className="mt-12 overflow-hidden border border-white/10 bg-uni-ink py-3">
             <Marquee items={BINARY} mono inverse />
           </div>
         </Reveal>

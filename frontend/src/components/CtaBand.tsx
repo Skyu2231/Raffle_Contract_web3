@@ -1,58 +1,81 @@
+import { Magnetic } from "./Magnetic";
+import { Marquee } from "./Marquee";
 import { Reveal } from "./Reveal";
-import { TrackingFox } from "./TrackingFox";
-import { ArrowRight, Fox, Sparkle } from "./icons";
+import { RevealText } from "./RevealText";
+import { ArrowUpRight, Sparkle } from "./icons";
 
 export function CtaBand() {
   return (
-    <section className="mx-auto w-full max-w-[1200px] px-4 pb-16 sm:px-6 lg:pb-24">
-      <Reveal>
-        <div className="relative overflow-hidden rounded-5xl bg-gradient-to-br from-[#ff7a2f] via-[#ff5c16] to-[#d94208] px-6 py-14 text-center text-white sm:px-12 sm:py-16">
-          <div
-            className="pointer-events-none absolute inset-0 opacity-40"
-            aria-hidden="true"
-            style={{
-              backgroundImage:
-                "radial-gradient(circle at 20% 10%, rgba(255,255,255,0.35), transparent 40%), radial-gradient(circle at 80% 90%, rgba(120,30,0,0.35), transparent 45%)",
-            }}
-          />
-          <div
-            className="pointer-events-none absolute inset-0 bg-[linear-gradient(110deg,transparent_35%,rgba(255,255,255,0.18)_50%,transparent_65%)] bg-[length:220%_100%] animate-shimmer"
-            aria-hidden="true"
-          />
+    <section className="relative overflow-hidden bg-fox text-white">
+      <div
+        className="pointer-events-none absolute inset-0 opacity-40"
+        aria-hidden="true"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle at 20% 10%, rgba(255,255,255,0.3), transparent 42%), radial-gradient(circle at 85% 90%, rgba(90,20,0,0.45), transparent 50%)",
+        }}
+      />
+      <div
+        className="pointer-events-none absolute inset-0 grid-lines opacity-[0.12]"
+        aria-hidden="true"
+      />
+      <div
+        className="pointer-events-none absolute -right-[4vw] -top-[6vw] hidden h-[26vw] w-[26vw] animate-orbit-slow rounded-full border border-dashed border-white/25 lg:block"
+        aria-hidden="true"
+      />
 
-          <div className="relative mx-auto max-w-[640px]">
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/15 px-3.5 py-1.5 font-mono text-[11px] uppercase tracking-[0.16em] backdrop-blur">
-              <Sparkle className="h-3.5 w-3.5" />
-              on-chain raffle · open now
+      <div className="relative mx-auto w-full max-w-[1440px] px-4 pb-14 pt-14 sm:px-8 lg:pb-20 lg:pt-20">
+        <div className="flex items-center justify-between gap-4 border-b border-white/25 pb-4 font-mono text-[9px] uppercase tracking-[0.22em] text-white/70">
+          <span className="flex items-center gap-2">
+            <Sparkle className="h-3 w-3" />
+            [ 06 — enter ]
+          </span>
+          <span className="hidden sm:inline">The next draw is already counting down</span>
+        </div>
+
+        <Reveal className="pt-10 lg:pt-14">
+          <h2 className="display text-[clamp(48px,10.5vw,168px)] leading-[0.82]">
+            <RevealText text="Your ticket" delay={0.05} />
+            <br />
+            <span className="serif-accent normal-case">
+              <RevealText text="to the pot." delay={0.2} />
             </span>
-            <h2 className="mt-5 text-balance font-display text-[36px] font-extrabold uppercase leading-[0.95] tracking-[-0.03em] sm:text-[56px]">
-              Your ticket to the pot.
-            </h2>
-            <p className="mx-auto mt-4 max-w-[460px] text-balance text-[15px] leading-relaxed text-white/80">
-              Connect a wallet, pick your tickets, and wait for the draw. The next winner could be
-              you.
-            </p>
-            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          </h2>
+        </Reveal>
+
+        <div className="mt-10 grid gap-8 border-t border-white/25 pt-8 lg:grid-cols-[1.2fr_auto] lg:items-end">
+          <p className="max-w-[440px] text-[15px] leading-relaxed text-white/80">
+            Connect a wallet, pick your tickets, and wait for the draw. No account, no custody, no
+            house cut — the next winner could be you.
+          </p>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <Magnetic strength={12}>
               <a
                 href="#raffle"
-                className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-6 py-3.5 text-base font-bold text-fox-deep transition duration-200 hover:-translate-y-0.5 hover:bg-[#fff6ef] sm:w-auto"
+                className="inline-flex w-full items-center justify-center gap-2.5 rounded-[4px] bg-bone px-7 py-4 font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-uni-ink transition duration-300 hover:-translate-y-0.5 hover:bg-white sm:w-auto"
               >
                 Enter the raffle
-                <ArrowRight className="h-4 w-4" />
+                <ArrowUpRight className="h-3.5 w-3.5" />
               </a>
-              <a
-                href="#how-it-works"
-                className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/40 bg-white/10 px-6 py-3.5 text-base font-semibold backdrop-blur transition duration-200 hover:-translate-y-0.5 hover:bg-white/20 sm:w-auto"
-              >
-                Read the rules
-              </a>
-            </div>
+            </Magnetic>
+            <a
+              href="#how-it-works"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-[4px] border border-white/45 px-7 py-4 font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-white transition duration-300 hover:-translate-y-0.5 hover:bg-white/10 sm:w-auto"
+            >
+              Read the rules
+            </a>
           </div>
-
-          <TrackingFox className="pointer-events-none absolute -bottom-8 -right-6 h-44 w-44 rotate-[-12deg] opacity-30 sm:h-56 sm:w-56" />
-          <Fox className="pointer-events-none absolute -left-10 -top-8 h-32 w-32 rotate-[14deg] opacity-20 animate-floaty-slow sm:h-40 sm:w-40" />
         </div>
-      </Reveal>
+      </div>
+
+      <div className="relative border-t border-white/25 py-3">
+        <Marquee
+          items={["Provably fair", "0% house edge", "Instant payout", "Fully on-chain", "VRF v2.5"]}
+          inverse
+          className="text-white"
+          mono
+        />
+      </div>
     </section>
   );
 }

@@ -5,14 +5,20 @@
 @layer base {
   :root {
     color-scheme: light;
+    --page: #f2eee6;
+    --ink: #111110;
+    --accent: #ff4d00;
   }
 
   .dark {
     color-scheme: dark;
+    --page: #0b0b0a;
+    --ink: #f4f1ea;
   }
 
   html {
     scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
   }
 
   html,
@@ -22,7 +28,7 @@
   }
 
   body {
-    @apply bg-cream font-sans text-uni-ink antialiased dark:bg-[#12100e] dark:text-white;
+    @apply bg-bone font-sans text-uni-ink antialiased dark:bg-void dark:text-[#f4f1ea];
     overflow-x: hidden;
   }
 
@@ -31,7 +37,25 @@
   }
 
   ::selection {
-    background: rgba(255, 92, 22, 0.22);
+    background: var(--accent);
+    color: #fff;
+  }
+
+  ::-webkit-scrollbar {
+    width: 9px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(17, 17, 16, 0.22);
+    border-radius: 99px;
+  }
+
+  .dark ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.18);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -49,30 +73,42 @@
   }
 }
 
+/* Lenis: native scroll stays available, the wrapper just smooths it. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
 @layer components {
   .surface {
-    @apply rounded-4xl border border-uni-line bg-white shadow-card dark:border-uni-darkline dark:bg-uni-surface dark:shadow-card-dark;
+    @apply relative border border-uni-line bg-cream-card dark:border-uni-darkline dark:bg-uni-surface;
   }
 
   .surface-soft {
-    @apply rounded-2xl bg-cream-deep dark:bg-[#28231f];
+    @apply bg-cream-deep dark:bg-[#201f1c];
   }
 
   .tnum {
     font-variant-numeric: tabular-nums;
   }
 
-  /* MetaMask-style orange pill CTA with a light sweep on hover */
   .btn-primary {
-    @apply relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full px-6 py-3.5 text-base font-semibold text-white
-      transition duration-200;
-    background-image: linear-gradient(135deg, #ff7a2f 0%, #ff5c16 55%, #f04f0a 100%);
-    box-shadow: 0 10px 26px -8px rgba(255, 92, 22, 0.55);
+    @apply relative inline-flex items-center justify-center gap-2.5 overflow-hidden rounded-[4px] px-6 py-4 font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-white transition duration-300;
+    background: var(--accent);
+    box-shadow: 0 12px 30px -16px rgba(255, 77, 0, 0.9);
   }
 
   .btn-primary:hover:not(:disabled) {
-    transform: translateY(-1px);
-    box-shadow: 0 16px 34px -10px rgba(255, 92, 22, 0.6);
+    transform: translateY(-2px);
+    box-shadow: 0 20px 38px -18px rgba(255, 77, 0, 0.95);
   }
 
   .btn-primary:active:not(:disabled) {
@@ -81,13 +117,13 @@
 
   .btn-primary:disabled {
     @apply cursor-not-allowed text-white/85;
-    background-image: linear-gradient(135deg, #ffc7a6 0%, #ffb488 100%);
+    background: #c9a58f;
     box-shadow: none;
   }
 
   .dark .btn-primary:disabled {
-    background-image: linear-gradient(135deg, #4a352a 0%, #3d2b22 100%);
-    @apply text-white/60;
+    @apply text-white/55;
+    background: #3d342d;
   }
 
   .btn-primary > .sheen {
@@ -99,25 +135,25 @@
   }
 
   .btn-ink {
-    @apply inline-flex items-center justify-center gap-2 rounded-full bg-uni-ink px-5 py-3 text-sm font-semibold text-white transition duration-200
-      hover:-translate-y-0.5 hover:bg-black disabled:cursor-not-allowed disabled:opacity-60 dark:bg-white dark:text-uni-ink dark:hover:bg-[#efe7df];
+    @apply inline-flex items-center justify-center gap-2 rounded-[3px] bg-uni-ink px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-white transition duration-300
+      hover:-translate-y-0.5 hover:bg-black disabled:cursor-not-allowed disabled:opacity-60 dark:bg-[#f4f1ea] dark:text-uni-ink dark:hover:bg-white;
   }
 
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-full border border-uni-line bg-white px-4 py-2.5 text-sm font-medium
-      text-uni-ink transition duration-200 hover:-translate-y-0.5 hover:border-fox-tint hover:bg-fox-soft
-      disabled:cursor-not-allowed disabled:opacity-60 dark:border-uni-darkline dark:bg-transparent dark:text-white dark:hover:border-fox/40 dark:hover:bg-fox/10;
+    @apply inline-flex items-center justify-center gap-2 rounded-[3px] border border-uni-line bg-transparent px-4 py-2.5 font-mono text-[10px] font-medium uppercase tracking-[0.14em]
+      text-uni-ink transition duration-300 hover:-translate-y-0.5 hover:border-uni-ink hover:bg-uni-ink hover:text-white
+      disabled:cursor-not-allowed disabled:opacity-60 dark:border-uni-darkline dark:text-[#f4f1ea] dark:hover:border-white dark:hover:bg-white dark:hover:text-uni-ink;
   }
 
   .btn-outline {
-    @apply inline-flex items-center justify-center gap-2 rounded-full border border-uni-ink/15 bg-white/70 px-5 py-3 text-sm font-semibold
-      text-uni-ink backdrop-blur transition duration-200 hover:-translate-y-0.5 hover:border-uni-ink/30 hover:bg-white
-      dark:border-white/15 dark:bg-white/5 dark:text-white dark:hover:bg-white/10;
+    @apply inline-flex items-center justify-center gap-2 rounded-[4px] border border-uni-ink/20 bg-transparent px-6 py-4 font-mono text-[11px] font-semibold uppercase tracking-[0.18em]
+      text-uni-ink transition duration-300 hover:-translate-y-0.5 hover:border-uni-ink hover:bg-uni-ink hover:text-bone
+      dark:border-white/25 dark:text-[#f4f1ea] dark:hover:border-white dark:hover:bg-white dark:hover:text-uni-ink;
   }
 
   .icon-btn {
-    @apply flex h-10 w-10 items-center justify-center rounded-full border border-uni-line bg-white text-uni-ink transition duration-200
-      hover:-translate-y-0.5 hover:border-fox-tint hover:bg-fox-soft dark:border-uni-darkline dark:bg-transparent dark:text-white dark:hover:border-fox/40 dark:hover:bg-fox/10;
+    @apply flex h-10 w-10 items-center justify-center rounded-full border border-uni-line bg-transparent text-uni-ink transition duration-300
+      hover:-translate-y-0.5 hover:border-uni-ink hover:bg-uni-ink hover:text-white dark:border-uni-darkline dark:text-white dark:hover:border-white dark:hover:bg-white dark:hover:text-uni-ink;
   }
 
   .label {
@@ -125,13 +161,22 @@
   }
 
   .eyebrow {
-    @apply inline-flex items-center gap-2 rounded-full border border-fox-tint/80 bg-white/80 px-3.5 py-1.5 text-xs font-semibold
-      text-fox-deep shadow-pill backdrop-blur dark:border-fox/25 dark:bg-fox/10 dark:text-fox-glow;
+    @apply inline-flex items-center gap-2 rounded-full border border-uni-ink/15 px-3.5 py-1.5 font-mono text-[10px] font-medium uppercase
+      tracking-[0.2em] text-uni-ink dark:border-white/20 dark:text-white/80;
   }
 
-  /* Chainlink-style monospace label: [ 01 — BUY ] */
   .tag-mono {
-    @apply font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-fox-deep dark:text-fox-glow;
+    @apply font-mono text-[10px] font-medium uppercase tracking-[0.24em] text-uni-muted dark:text-white/45;
+  }
+
+  /* The workhorse display style: wide, tight, editorial. */
+  .display {
+    @apply font-display font-extrabold uppercase leading-[0.82] tracking-tightest;
+    font-stretch: 108%;
+  }
+
+  .serif-accent {
+    @apply font-serif font-normal italic tracking-[-0.02em];
   }
 }
 
@@ -153,17 +198,34 @@
     mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
   }
 
+  .mask-fade-b {
+    mask-image: linear-gradient(to bottom, black 65%, transparent);
+  }
+
   .text-balance {
     text-wrap: balance;
   }
 
-  /* scroll reveal — driven by IntersectionObserver in useReveal */
+  .text-stroke {
+    -webkit-text-stroke: 1px rgba(17, 17, 16, 0.35);
+    color: transparent;
+  }
+
+  .dark .text-stroke {
+    -webkit-text-stroke: 1px rgba(244, 241, 234, 0.32);
+  }
+
+  .text-stroke-accent {
+    -webkit-text-stroke: 1px rgba(255, 77, 0, 0.55);
+    color: transparent;
+  }
+
   .reveal {
     opacity: 0;
-    transform: translateY(18px);
+    transform: translateY(22px);
     transition:
-      opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
-      transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+      opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
     will-change: opacity, transform;
   }
 
@@ -174,19 +236,19 @@
 
   .grid-lines {
     background-image:
-      linear-gradient(to right, rgba(23, 19, 16, 0.045) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(23, 19, 16, 0.045) 1px, transparent 1px);
-    background-size: 64px 64px;
+      linear-gradient(to right, rgba(17, 17, 16, 0.07) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(17, 17, 16, 0.07) 1px, transparent 1px);
+    background-size: 88px 88px;
   }
 
   .dark .grid-lines {
     background-image:
-      linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+      linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
   }
 
   .fox-gradient-text {
-    background-image: linear-gradient(100deg, #ff8a4c 0%, #ff5c16 45%, #e2470a 100%);
+    background-image: linear-gradient(100deg, #ff8a4c 0%, #ff4d00 48%, #d63c00 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -196,7 +258,6 @@
     animation-play-state: paused;
   }
 
-  /* pointer-tracked 3D tilt (values written by <Tilt />) */
   .tilt {
     transform: perspective(1100px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
     transform-style: preserve-3d;
@@ -207,14 +268,13 @@
   .tilt-glare {
     background: radial-gradient(
       420px circle at var(--glare-x, 50%) var(--glare-y, 50%),
-      rgba(255, 255, 255, 0.5),
+      rgba(255, 255, 255, 0.4),
       transparent 62%
     );
     opacity: var(--glare, 0);
     transition: opacity 0.35s ease;
   }
 
-  /* light sweep across a card on hover */
   .card-shine::after {
     content: "";
     position: absolute;
@@ -223,7 +283,7 @@
     background: linear-gradient(
       105deg,
       transparent 30%,
-      rgba(255, 255, 255, 0.55) 48%,
+      rgba(255, 255, 255, 0.45) 48%,
       transparent 66%
     );
     transform: translateX(-130%);
@@ -234,55 +294,69 @@
     transform: translateX(130%);
   }
 
-  .dark .card-shine::after {
-    background: linear-gradient(
-      105deg,
-      transparent 30%,
-      rgba(255, 255, 255, 0.14) 48%,
-      transparent 66%
-    );
-  }
-
-  /* soft film grain, Aave-ish texture */
   .noise {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
-    opacity: 0.035;
+    opacity: 0.05;
   }
 
-  .mask-fade-b {
-    mask-image: linear-gradient(to bottom, black 65%, transparent);
+  .dark .noise {
+    opacity: 0.08;
   }
 
-  /* Chainlink-ish corner ticks; pair with .card-shine on an inner element */
+  /* Corner ticks — sharp, technical framing. */
   .bracket-card::before,
   .bracket-card::after {
     content: "";
     position: absolute;
-    width: 14px;
-    height: 14px;
+    width: 16px;
+    height: 16px;
     pointer-events: none;
-    border-color: rgba(255, 92, 22, 0.45);
+    border-color: rgba(255, 77, 0, 0.55);
     z-index: 1;
   }
 
   .bracket-card::before {
-    top: 14px;
-    left: 14px;
+    top: 10px;
+    left: 10px;
     border-top: 1px solid;
     border-left: 1px solid;
-    border-top-left-radius: 4px;
   }
 
   .bracket-card::after {
-    right: 14px;
-    bottom: 14px;
+    right: 10px;
+    bottom: 10px;
     border-right: 1px solid;
     border-bottom: 1px solid;
-    border-bottom-right-radius: 4px;
   }
 
-  .dark .bracket-card::before,
-  .dark .bracket-card::after {
-    border-color: rgba(255, 138, 76, 0.4);
+  /* Hover link with a sliding rule underneath. */
+  .link-line {
+    position: relative;
+  }
+
+  .link-line::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    height: 1px;
+    width: 100%;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .link-line:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  .hairline {
+    background: linear-gradient(to right, transparent, rgba(17, 17, 16, 0.18), transparent);
+  }
+
+  .dark .hairline {
+    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.16), transparent);
   }
 }
