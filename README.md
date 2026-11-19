@@ -78,7 +78,8 @@ Two local quirks worth knowing:
 
 ## Deploy to Sepolia
 
-1. Set your environment variables (copy `.env.example` to `.env`):
+1. Set your environment variables in a `.env` file at the repo root (create it yourself —
+   it is git-ignored):
 
    - `PRIVATE_KEY` — the deployer key. **Use a key with no real funds.**
    - `SEPOLIA_RPC_URL` — free endpoints from [Alchemy](https://alchemy.com/) or Infura.
