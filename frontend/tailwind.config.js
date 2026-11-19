@@ -84,6 +84,11 @@ export default {
           "0%": { transform: "translateX(-120%) skewX(-18deg)" },
           "100%": { transform: "translateX(220%) skewX(-18deg)" },
         },
+        shockwave: {
+          "0%": { transform: "translate(-50%, -50%) scale(0.2)", opacity: "0.55" },
+          "70%": { opacity: "0.18" },
+          "100%": { transform: "translate(-50%, -50%) scale(1.35)", opacity: "0" },
+        },
         pulseRing: {
           "0%": { transform: "scale(0.85)", opacity: "0.7" },
           "70%": { transform: "scale(1.9)", opacity: "0" },
@@ -119,6 +124,7 @@ export default {
         "marquee-rev": "marquee-rev 32s linear infinite",
         shimmer: "shimmer 6s linear infinite",
         sheen: "sheen 0.85s ease-out",
+        shockwave: "shockwave 720ms cubic-bezier(0.22,1,0.36,1) forwards",
         "pulse-ring": "pulseRing 2.2s ease-out infinite",
         wiggle: "wiggle 4s ease-in-out infinite",
         "pop-in": "popIn 0.3s cubic-bezier(0.22,1,0.36,1) both",

@@ -1,3 +1,4 @@
+import { useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import {
   motion,
   useReducedMotion,
@@ -21,6 +22,7 @@ import { ArrowDown, ArrowUpRight, Sparkle } from "./icons";
 type HeroProps = {
   stats: RaffleStats;
   countdown: number;
+  theme: "light" | "dark";
 };
 
 const TRUST = ["0% house edge", "Instant payout", "Self-custody", "VRF v2.5"];
@@ -41,7 +43,8 @@ function LiveStat({ label, value, sub }: { label: string; value: string; sub: st
   );
 }
 
-export function Hero({ stats, countdown }: HeroProps) {
+export function Hero({ stats, countdown, theme }: HeroProps) {
+  const dark = theme === "dark";
   const tickets = stats.players.length;
   const drawIn = !stats.open ? "Drawing…" : countdown > 0 ? formatDuration(countdown) : "Ready";
 
@@ -52,6 +55,23 @@ export function Hero({ stats, countdown }: HeroProps) {
   const skewX = useTransform(smoothVelocity, (value) =>
     Math.max(-4, Math.min(4, -value * 0.0025)),
   );
+
+  const [shocks, setShocks] = useState<{ id: number; x: number; y: number }[]>([]);
+  const shockId = useRef(0);
+
+  const onShock = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (reduced) return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    const id = ++shockId.current;
+    setShocks((current) => [
+      ...current,
+      { id, x: event.clientX - rect.left, y: event.clientY - rect.top },
+    ]);
+  };
+
+  const removeShock = (id: number) => {
+    setShocks((current) => current.filter((shock) => shock.id !== id));
+  };
 
   return (
     <section className="relative overflow-hidden border-b border-uni-line dark:border-uni-darkline">
@@ -161,22 +181,51 @@ export function Hero({ stats, countdown }: HeroProps) {
 
             <div
               data-cursor-label="Live field"
-              className="relative order-first min-h-[280px] overflow-hidden rounded-[4px] border border-uni-line bg-[#080706] sm:min-h-[340px] lg:order-none dark:border-uni-darkline"
+              onPointerDown={onShock}
+              className={`relative order-first min-h-[280px] overflow-hidden rounded-[4px] border sm:min-h-[340px] lg:order-none ${
+                dark
+                  ? "border-uni-darkline bg-[#080706]"
+                  : "border-uni-line bg-[#e7e0d3]"
+              }`}
             >
-              <HeroScene className="absolute inset-0 block h-full w-full" />
-              <div className="pointer-events-none absolute inset-0 stage-grid [mask-image:radial-gradient(ellipse_at_center,black,transparent_88%)]" />
-              <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-white/10" />
-              <div className="pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between gap-3 border-b border-white/10 px-4 py-2.5 font-mono text-[9px] uppercase tracking-[0.18em] text-white/45">
+              <HeroScene theme={theme} className="absolute inset-0 block h-full w-full" />
+              {shocks.map((shock) => (
+                <span
+                  key={shock.id}
+                  aria-hidden="true"
+                  onAnimationEnd={() => removeShock(shock.id)}
+                  style={{ left: shock.x, top: shock.y }}
+                  className={`pointer-events-none absolute h-32 w-32 animate-shockwave rounded-full border sm:h-40 sm:w-40 ${
+                    dark
+                      ? "border-white/40 shadow-[0_0_24px_rgba(255,77,0,0.18)]"
+                      : "border-uni-ink/25 shadow-[0_0_24px_rgba(255,77,0,0.14)]"
+                  }`}
+                />
+              ))}
+              <div
+                className={`pointer-events-none absolute inset-0 ring-1 ring-inset ${
+                  dark ? "ring-white/10" : "ring-black/10"
+                }`}
+              />
+              <div
+                className={`pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between gap-3 border-b px-4 py-2.5 font-mono text-[9px] uppercase tracking-[0.18em] ${
+                  dark ? "border-white/10 text-white/45" : "border-black/10 text-uni-ink/55"
+                }`}
+              >
                 <span className="flex items-center gap-2">
-                  <Sparkle className="h-3 w-3 text-fox-glow" />
+                  <Sparkle className="h-3 w-3 text-fox" />
                   [ field 001 ]
                 </span>
                 <span className="hidden sm:inline">SDF / fluid / post</span>
               </div>
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 border-t border-white/10 px-4 py-2.5 font-mono text-[9px] uppercase tracking-[0.18em] text-white/40">
-                <span>move cursor to disturb</span>
+              <div
+                className={`pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 border-t px-4 py-2.5 font-mono text-[9px] uppercase tracking-[0.18em] ${
+                  dark ? "border-white/10 text-white/40" : "border-black/10 text-uni-ink/50"
+                }`}
+              >
+                <span>move or tap to disturb</span>
                 <span className="flex items-center gap-1.5">
-                  <span className="h-1 w-1 animate-pulse rounded-full bg-fox-glow" />
+                  <span className="h-1 w-1 animate-pulse rounded-full bg-fox" />
                   live render
                 </span>
               </div>

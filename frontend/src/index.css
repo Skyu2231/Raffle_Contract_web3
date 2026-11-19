@@ -247,14 +247,6 @@ html.lenis body {
       linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
   }
 
-  /* Always-light hairlines for dark stages (hero field, CTA). */
-  .stage-grid {
-    background-image:
-      linear-gradient(to right, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
-    background-size: 56px 56px;
-  }
-
   .fox-gradient-text {
     background-image: linear-gradient(100deg, #ff8a4c 0%, #ff4d00 48%, #d63c00 100%);
     -webkit-background-clip: text;
