@@ -10,6 +10,7 @@ import { Manifesto } from "./components/Manifesto";
 import { Navbar } from "./components/Navbar";
 import { Preloader } from "./components/Preloader";
 import { RaffleCard } from "./components/RaffleCard";
+import { RaffleTransition } from "./components/RaffleTransition";
 import { Reveal } from "./components/Reveal";
 import { RevealText } from "./components/RevealText";
 import { ScrollProgress } from "./components/ScrollProgress";
@@ -61,6 +62,7 @@ export default function App() {
     <div className="relative min-h-screen">
       <SmoothScroll />
       <Preloader />
+      <RaffleTransition />
       <Cursor />
       <div className="noise pointer-events-none fixed inset-0 z-[5]" aria-hidden="true" />
       <ScrollProgress />
@@ -72,7 +74,7 @@ export default function App() {
         contractAddress={stats.address}
       />
 
-      <Hero stats={stats} countdown={countdown} />
+      <Hero stats={stats} countdown={countdown} theme={theme} />
 
       <div className="overflow-hidden border-b border-uni-line bg-bone py-4 dark:border-uni-darkline dark:bg-void sm:py-6">
         <ScrollTicker items={TICKER} />
