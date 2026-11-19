@@ -1,6 +1,6 @@
 -include .env
 
-.PHONY: all test clean deploy fund help install snapshot format anvil 
+.PHONY: all test clean deploy deploy-local fulfill-local fund help install snapshot format anvil 
 
 DEFAULT_ANVIL_KEY := 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
 
@@ -31,9 +31,9 @@ snapshot :; forge snapshot
 
 format :; forge fmt
 
-anvil :; anvil -m 'test test test test test test test test test test test junk' --steps-tracing --block-time 1
+anvil :; anvil -m 'test test test test test test test test test test test junk' --steps-tracing --block-time 1 --disable-code-size-limit
 
-NETWORK_ARGS := --rpc-url http://localhost:8545 --private-key $(DEFAULT_ANVIL_KEY) --broadcast
+NETWORK_ARGS := --rpc-url http://localhost:8545 --private-key $(DEFAULT_ANVIL_KEY) --broadcast --disable-code-size-limit
 
 ifeq ($(findstring --network sepolia,$(ARGS)),--network sepolia)
 	NETWORK_ARGS := --rpc-url $(SEPOLIA_RPC_URL) --private-key $(PRIVATE_KEY) --broadcast --verify --etherscan-api-key $(ETHERSCAN_API_KEY) -vvvv
@@ -41,6 +41,15 @@ endif
 
 deploy:
 	@forge script script/DeployRaffle.s.sol:DeployRaffle $(NETWORK_ARGS)
+
+# Local Anvil deployment. The mock VRF subscription id is created and read
+# on-chain first, then passed to the Raffle constructor.
+deploy-local:
+	@bash script/deploy-local.sh
+
+# Fulfil the pending mock VRF request after clicking "Draw winner" locally.
+fulfill-local:
+	@bash script/fulfill-local.sh $(RAFFLE)
 
 createSubscription:
 	@forge script script/Interactions.s.sol:CreateSubscription $(NETWORK_ARGS)

@@ -1,207 +1,158 @@
+# Raffle Web3 — Smart Contract Lottery
 
-> ! Updates from Video
-> 1. V2.5 of Chainlink VRF uses a `uint256` as a subId instead of a `uint64` this repo has a comment to reflect that. We added a mock in case you'd like to work with version 2.5.
-> 2. We use `0.1.0` of the `foundry-devops` package which doesn't need to have `ffi=true`# Foundry Smart Contract Lottery
+A decentralized raffle: users pay a fixed entrance fee to enter, Chainlink VRF picks a
+provably random winner, and Chainlink Automation triggers the draw once the interval has
+passed. The contract is written in Solidity with Foundry, and a React + wagmi frontend in
+[`./frontend`](./frontend) drives it from the browser through MetaMask.
 
-This is a section of the Cyfrin Foundry Solidity Course.
+- **Entrance fee:** `0.01 ETH`
+- **Draw interval:** `30s` (configurable in `script/HelperConfig.s.sol`)
+- **Randomness:** Chainlink VRF v2.5
+- **Automation:** Chainlink Automation (`checkUpkeep` / `performUpkeep`)
 
-> **Web app:** a full MetaMask-inspired, orange-and-white frontend for this raffle lives in [`./frontend`](./frontend).
-> It buys tickets, shows the live prize pool, players, countdown and activity, and can trigger
-> the draw. See its README for the local Anvil and Sepolia setup.
+## Contents
 
+- [Repository layout](#repository-layout)
+- [Requirements](#requirements)
+- [Quickstart](#quickstart)
+- [Local development (no faucet needed)](#local-development-no-faucet-needed)
+- [Deploy to Sepolia](#deploy-to-sepolia)
+- [Testing](#testing)
+- [Scripts and helpers](#scripts-and-helpers)
+- [Formatting and gas snapshots](#formatting-and-gas-snapshots)
+- [Web app](#web-app)
 
-*[⭐️ (3:04:09) | Lesson 9: Foundry Smart Contract Lottery](https://www.youtube.com/watch?v=sas02qSFZ74&t=11049s)*
+## Repository layout
 
-- [Foundry Smart Contract Lottery](#foundry-smart-contract-lottery)
-- [Getting Started](#getting-started)
-  - [Requirements](#requirements)
-  - [Quickstart](#quickstart)
-    - [Optional Gitpod](#optional-gitpod)
-- [Usage](#usage)
-  - [Start a local node](#start-a-local-node)
-  - [Library](#library)
-  - [Deploy](#deploy)
-  - [Deploy - Other Network](#deploy---other-network)
-  - [Testing](#testing)
-    - [Test Coverage](#test-coverage)
-- [Deployment to a testnet or mainnet](#deployment-to-a-testnet-or-mainnet)
-  - [Scripts](#scripts)
-  - [Estimate gas](#estimate-gas)
-- [Formatting](#formatting)
-- [Additional Info:](#additional-info)
-  - [Let's talk about what "Official" means](#lets-talk-about-what-official-means)
-  - [Summary](#summary)
-- [Thank you!](#thank-you)
-
-# Getting Started
+```
+src/Raffle.sol              The raffle contract
+src/mocks/                  Mock VRF coordinator and LINK token for local runs
+script/HelperConfig.s.sol   Per-network config (fee, interval, VRF coordinator, subscription)
+script/DeployRaffle.s.sol   Deploy script (used by `make deploy`)
+script/deploy-local.sh      Local Anvil deploy: mock VRF + subscription + raffle
+script/fulfill-local.sh     Fulfils a pending local draw (the mock does not auto-fulfil)
+test/                       Unit and forked tests
+frontend/                   React + wagmi web app
+```
 
 ## Requirements
 
-- [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-  - You'll know you did it right if you can run `git --version` and you see a response like `git version x.x.x`
-- [foundry](https://getfoundry.sh/)
-  - You'll know you did it right if you can run `forge --version` and you see a response like `forge 0.2.0 (816e00b 2023-03-16T00:05:26.396218Z)`
+- [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) — `git --version`
+- [foundry](https://getfoundry.sh/) — `forge --version`
+- [Node.js](https://nodejs.org/) 18+ (only for the frontend)
 
 ## Quickstart
 
-```
-git clone https://github.com/Cyfrin/foundry-smart-contract-lottery-cu
-cd foundry-smart-contract-lottery-cu
+```bash
+git clone git@github.com:Skyu2231/Raffle_Contract_web.git
+cd Raffle_Contract_web
+git submodule update --init --recursive
 forge build
 ```
 
-### Optional Gitpod
+`lib/` is committed as git submodules (`forge-std`, `solmate`, `chainlink-brownie-contracts`,
+`foundry-devops`), so the `git submodule update` step above is required after cloning.
 
-If you can't or don't want to run and install locally, you can work with this repo in Gitpod. If you do this, you can skip the `clone this repo` part.
+## Local development (no faucet needed)
 
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#github.com/Cyfrin/foundry-smart-contract-lottery-cu)
+Everything runs on a local Anvil chain with mock VRF, so you get test ETH by importing an
+Anvil account into MetaMask. No faucet, no real funds.
 
-# Usage
-
-## Start a local node
-
-```
-make anvil
-```
-
-## Library
-
-If you're having a hard time installing the chainlink library, you can optionally run this command. 
-
-```
-forge install smartcontractkit/chainlink-brownie-contracts@0.6.1
+```bash
+make anvil          # terminal 1: local chain on http://127.0.0.1:8545 (chain id 31337)
+make deploy-local   # terminal 2: mock VRF + LINK, subscription, raffle
+make fulfill-local  # terminal 3: fulfil a pending draw after you click Draw
 ```
 
-## Deploy
+`make deploy-local` writes `frontend/.env.local` with the deployed address, so the web app
+picks it up with no manual editing. Anvil's default mnemonic
+(`test test test ... junk`) gives ten funded accounts; import one into MetaMask with network
+`http://127.0.0.1:8545`, chain id `31337` and you can buy tickets immediately.
 
-This will default to your local node. You need to have it running in another terminal in order for it to deploy.
+Two local quirks worth knowing:
 
-```
-make deploy
-```
+- The mock VRF coordinator is larger than the EIP-170 contract size limit, so `make anvil`
+  starts the chain with `--disable-code-size-limit`.
+- The mock does not auto-fulfil randomness. After a draw is requested, run
+  `make fulfill-local` to pick the winner.
 
-## Deploy - Other Network
+## Deploy to Sepolia
 
-[See below](#deployment-to-a-testnet-or-mainnet)
+1. Set your environment variables (copy `.env.example` to `.env`):
+
+   - `PRIVATE_KEY` — the deployer key. **Use a key with no real funds.**
+   - `SEPOLIA_RPC_URL` — free endpoints from [Alchemy](https://alchemy.com/) or Infura.
+   - `ETHERSCAN_API_KEY` — optional, only for contract verification.
+   - `DEPLOYER_ADDRESS` — optional, the wallet that owns the VRF subscription (defaults to
+     the deployer).
+   - `VRF_SUBSCRIPTION_ID` — optional, an existing VRF v2.5 subscription id.
+
+2. Get free Sepolia ETH and test LINK from the [Chainlink faucet](https://faucets.chain.link/sepolia).
+
+3. Create a VRF v2.5 subscription at [vrf.chain.link/sepolia](https://vrf.chain.link/sepolia),
+   fund it with LINK, and put its id in `VRF_SUBSCRIPTION_ID`. Without that variable the
+   deploy script creates the subscription itself.
+
+4. Deploy:
+
+   ```bash
+   make deploy ARGS="--network sepolia"
+   ```
+
+5. Register an Automation upkeep at [automation.chain.link](https://automation.chain.link/new)
+   using **Custom logic** with the raffle address as the target, so the draw fires on its own.
+
+On a real testnet, VRF fulfils automatically — there is no `fulfill-local` step.
 
 ## Testing
 
-We talk about 4 test tiers in the video.
-
-1. Unit
-2. Integration
-3. Forked
-4. Staging
-
-This repo we cover #1 and #3.
-
-```
-forge test
-```
-
-or
-
-```
-forge test --fork-url $SEPOLIA_RPC_URL
-```
-
-### Test Coverage
-
-```
+```bash
+forge test                       # unit tests
+forge test --fork-url $SEPOLIA_RPC_URL   # forked tests
 forge coverage
 ```
 
-# Deployment to a testnet or mainnet
+## Scripts and helpers
 
-1. Setup environment variables
-
-You'll want to set your `SEPOLIA_RPC_URL` and `PRIVATE_KEY` as environment variables. You can add them to a `.env` file, similar to what you see in `.env.example`.
-
-- `PRIVATE_KEY`: The private key of your account (like from [metamask](https://metamask.io/)). **NOTE:** FOR DEVELOPMENT, PLEASE USE A KEY THAT DOESN'T HAVE ANY REAL FUNDS ASSOCIATED WITH IT.
-  - You can [learn how to export it here](https://metamask.zendesk.com/hc/en-us/articles/360015289632-How-to-Export-an-Account-Private-Key).
-- `SEPOLIA_RPC_URL`: This is url of the sepolia testnet node you're working with. You can get setup with one for free from [Alchemy](https://alchemy.com/?a=673c802981)
-
-Optionally, add your `ETHERSCAN_API_KEY` if you want to verify your contract on [Etherscan](https://etherscan.io/).
-
-1. Get testnet ETH
-
-Head over to [faucets.chain.link](https://faucets.chain.link/) and get some testnet ETH. You should see the ETH show up in your metamask.
-
-2. Deploy
-
-```
-make deploy ARGS="--network sepolia"
-```
-
-This will setup a ChainlinkVRF Subscription for you. If you already have one, update it in the `scripts/HelperConfig.s.sol` file. It will also automatically add your contract as a consumer.
-
-3. Register a Chainlink Automation Upkeep
-
-[You can follow the documentation if you get lost.](https://docs.chain.link/chainlink-automation/compatible-contracts)
-
-Go to [automation.chain.link](https://automation.chain.link/new) and register a new upkeep. Choose `Custom logic` as your trigger mechanism for automation. Your UI will look something like this once completed:
-
-![Automation](./img/automation.png)
-
-## Scripts
-
-After deploying to a testnet or local net, you can run the scripts.
-
-Using cast deployed locally example:
-
-```
-cast send <RAFFLE_CONTRACT_ADDRESS> "enterRaffle()" --value 0.1ether --private-key <PRIVATE_KEY> --rpc-url $SEPOLIA_RPC_URL
-```
-
-or, to create a ChainlinkVRF Subscription:
-
-```
+```bash
+make help                                   # list every target
 make createSubscription ARGS="--network sepolia"
+make addConsumer ARGS="--network sepolia"
+make fundSubscription ARGS="--network sepolia"
 ```
 
-## Estimate gas
+Enter a raffle from the CLI:
 
-You can estimate how much gas things cost by running:
-
-```
-forge snapshot
-```
-
-And you'll see an output file called `.gas-snapshot`
-
-# Formatting
-
-To run code formatting:
-
-```
-forge fmt
+```bash
+cast send <RAFFLE_ADDRESS> "enterRaffle()" --value 0.01ether \
+  --private-key $PRIVATE_KEY --rpc-url $SEPOLIA_RPC_URL
 ```
 
-# Additional Info:
-Some users were having a confusion that whether Chainlink-brownie-contracts is an official Chainlink repository or not. Here is the info.
-Chainlink-brownie-contracts is an official repo. The repository is owned and maintained by the chainlink team for this very purpose, and gets releases from the proper chainlink release process. You can see it's still the `smartcontractkit` org as well.
+## Formatting and gas snapshots
 
-https://github.com/smartcontractkit/chainlink-brownie-contracts
+```bash
+forge fmt        # format
+forge snapshot   # writes .gas-snapshot
+```
 
-## Let's talk about what "Official" means
-The "official" release process is that chainlink deploys it's packages to [npm](https://www.npmjs.com/package/@chainlink/contracts). So technically, even downloading directly from `smartcontractkit/chainlink` is wrong, because it could be using unreleased code.
+## Web app
 
-So, then you have two options:
+The frontend in [`./frontend`](./frontend) is a full MetaMask-oriented interface: connect
+wallet, enter the raffle, live prize pool, players list, countdown, activity feed, and the
+Draw button. It supports both the local Anvil chain and Sepolia.
 
-1. Download from NPM and have your codebase have dependencies foreign to foundry
-2. Download from the chainlink-brownie-contracts repo which already downloads from npm and then packages it nicely for you to use in foundry.
-## Summary
-1. That is an official repo maintained by the same org
-2. It downloads from the official release cycle `chainlink/contracts` use (npm) and packages it nicely for digestion from foundry.
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
+See [`frontend/README.md`](./frontend/README.md) for configuration details.
 
-# Thank you!
+## Credits
 
-If you appreciated this, feel free to follow me or donate!
-
-ETH/Arbitrum/Optimism/Polygon/etc Address: 0x9680201d9c93d65a3603d2088d125e955c73BD65
-
-[![Patrick Collins Twitter](https://img.shields.io/badge/Twitter-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white)](https://twitter.com/PatrickAlphaC)
-[![Patrick Collins YouTube](https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/channel/UCn-3f8tw_E1jZvhuHatROwA)
-[![Patrick Collins Linkedin](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/patrickalphac/)
-[![Patrick Collins Medium](https://img.shields.io/badge/Medium-000000?style=for-the-badge&logo=medium&logoColor=white)](https://medium.com/@patrick.collins_58673/)
+Built as a learning project following the
+[Cyfrin Foundry Solidity course](https://github.com/Cyfrin/foundry-smart-contract-lottery-cu)
+by Patrick Collins. `chainlink-brownie-contracts` is the official Chainlink-maintained
+Foundry packaging of `@chainlink/contracts`, released through the standard Chainlink
+release process.

@@ -53,45 +53,61 @@ make anvil
 In another, from the repo root:
 
 ```bash
-make deploy
+make deploy-local
 ```
 
-The deploy script prints:
+This deploys the mock VRF coordinator and LINK token, creates and funds a subscription,
+deploys the Raffle, and writes `frontend/.env.local` with the address and chain id. Start
+`npm run dev`, add an Anvil network in MetaMask (`RPC http://127.0.0.1:8545`, chain id
+`31337`), import one of the test accounts printed by Anvil (10,000 free ETH), and enter the
+raffle.
 
-```
-Raffle deployed at: 0x...
-Chain ID: 31337
-```
-
-Put that address in `frontend/.env`:
+After the 30s interval, click **Draw winner**, then fulfil the mock request from the repo
+root:
 
 ```bash
-VITE_CHAIN_ID=31337
-VITE_RAFFLE_ADDRESS_31337=0x...
+make fulfill-local
 ```
 
-Restart `npm run dev`, connect the Anvil account to your wallet
-(`RPC http://127.0.0.1:8545`, chain id `31337`), and enter the raffle. The local deployment
-ships with a mock VRF coordinator, so after the 30s interval you can hit **Draw winner**
-yourself.
+The mock VRF coordinator does not fulfil requests by itself, and it charges test LINK for
+the draw (the deploy funds 100 LINK for this). Delete `frontend/.env.local` before switching
+the app back to Sepolia.
 
 ## Sepolia
 
-From the repo root:
+Sepolia ETH is free test money. Get test ETH and test LINK from
+[faucets.chain.link/sepolia](https://faucets.chain.link/sepolia); if that faucet is empty,
+the Google Cloud, Infura and Alchemy Sepolia faucets also hand out ETH. Never use a wallet
+that holds real funds.
+
+1. Create a VRF v2.5 subscription at [vrf.chain.link/sepolia](https://vrf.chain.link/sepolia),
+   fund it with test LINK, and note the subscription id.
+2. Add to the repo-root `.env`:
+
+```bash
+PRIVATE_KEY=0x...            # test-only MetaMask account
+SEPOLIA_RPC_URL=https://...  # Alchemy/Infura Sepolia endpoint
+ETHERSCAN_API_KEY=...        # used by `make deploy` for verification
+DEPLOYER_ADDRESS=0x...       # same account, must own the subscription
+VRF_SUBSCRIPTION_ID=123      # from vrf.chain.link
+```
+
+3. Deploy from the repo root:
 
 ```bash
 make deploy ARGS="--network sepolia"
 ```
 
-Copy the printed address into `frontend/.env`:
+4. Copy the printed address into `frontend/.env`:
 
 ```bash
 VITE_CHAIN_ID=11155111
 VITE_RAFFLE_ADDRESS_11155111=0x...
 ```
 
-Register a Chainlink Automation upkeep on the contract (see the Foundry README) so draws
-happen without a manual click.
+Switch MetaMask to Sepolia and restart `npm run dev`. The public VRF coordinator fulfils
+draws automatically; click **Draw winner** after the interval (or register a Chainlink
+Automation upkeep to do it without a click).
 
 ## Environment variables
 
